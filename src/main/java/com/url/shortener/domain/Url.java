@@ -3,6 +3,7 @@ package com.url.shortener.domain;
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
+@DynamicInsert
 public class Url {
 
     @Id
@@ -32,15 +34,13 @@ public class Url {
     @Column(length = 1000, nullable = false)
     private String originalUrl;
 
-    @Column(length = 50, nullable = false)
+    @Column(length = 50)
     private String shortUrl;
 
     @ColumnDefault("0")
-    @Column(nullable = false)
     private Integer requestCount;
 
     @ColumnDefault("1")
-    @Column(nullable = false)
     private Integer shorteningCount;
 
     @CreatedDate
@@ -49,4 +49,12 @@ public class Url {
 
     @LastModifiedDate
     private LocalDateTime updatedDatetime;
+
+    private Url(String originalUrl) {
+        this.originalUrl = originalUrl;
+    }
+
+    public static Url from(String originalUrl) {
+        return new Url(originalUrl);
+    }
 }
