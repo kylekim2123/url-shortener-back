@@ -22,6 +22,8 @@ public class UrlService {
         Url url = urlRequest.toEntity();
         Url savedUrl = urlRepository.save(url);
 
+        savedUrl.generateShortUrlKey();
+
         return UrlIdResponse.from(savedUrl.getId());
     }
 }
