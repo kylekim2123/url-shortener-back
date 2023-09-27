@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -24,6 +25,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @DynamicInsert
+@DynamicUpdate
 @Table(name = "url")
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -64,5 +66,9 @@ public class Url {
 
     public void generateShortUrlKey() {
         this.shortUrlKey = Base62Util.encodeFromNumber(id + INITIAL_PADDING);
+    }
+
+    public void increaseShorteningCount() {
+        this.shorteningCount += 1;
     }
 }

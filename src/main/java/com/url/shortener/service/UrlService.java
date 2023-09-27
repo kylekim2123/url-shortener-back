@@ -1,5 +1,7 @@
 package com.url.shortener.service;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +22,16 @@ public class UrlService {
     @Transactional
     public UrlIdResponse createShortUrl(UrlRequest urlRequest) {
         Url url = urlRequest.toEntity();
-        Url savedUrl = urlRepository.save(url);
+        Optional<Url> foundUrl = urlRepository.findByOriginalUrl(url.getOriginalUrl());
 
+        if (foundUrl.isPresent()) {
+            Url existedUrl = foundUrl.get();
+            existedUrl.increaseShorteningCount();
+
+            return UrlIdResponse.from(existedUrl.getId());
+        }
+
+        Url savedUrl = urlRepository.save(url);
         savedUrl.generateShortUrlKey();
 
         return UrlIdResponse.from(savedUrl.getId());
