@@ -8,6 +8,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.url.shortener.utils.Base62Util;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -20,22 +22,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "url")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EntityListeners(AuditingEntityListener.class)
 @DynamicInsert
+@Table(name = "url")
+@EntityListeners(AuditingEntityListener.class)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Url {
+
+    private static final Long INITIAL_PADDING = 1_000_000L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000, nullable = false, unique = true)
     private String originalUrl;
 
-    @Column(length = 50)
-    private String shortUrl;
+    @Column(length = 10, unique = true)
+    private String shortUrlKey;
 
     @ColumnDefault("0")
     private Integer requestCount;
@@ -56,5 +60,9 @@ public class Url {
 
     public static Url from(String originalUrl) {
         return new Url(originalUrl);
+    }
+
+    public void generateShortUrlKey() {
+        this.shortUrlKey = Base62Util.encodeFromNumber(id + INITIAL_PADDING);
     }
 }
