@@ -13,6 +13,7 @@ import com.url.shortener.dto.response.UrlIdResponse;
 import com.url.shortener.dto.response.UrlResponse;
 import com.url.shortener.service.UrlService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,5 +31,13 @@ public class UrlController {
     @GetMapping("/api/short-urls/{id}")
     public UrlResponse findShortUrlById(@PathVariable Long id) {
         return urlService.findShortUrlById(id);
+    }
+
+    @GetMapping("/{key}")
+    @ResponseStatus(HttpStatus.MOVED_PERMANENTLY)
+    public void requestShortUrl(@PathVariable String key, HttpServletResponse response) {
+        String originalUrl = urlService.getOriginalUrlByShortUrlKey(key);
+        response.setHeader("Location", originalUrl);
+        response.setHeader("Cache-Control", "private, max-age=90");
     }
 }
