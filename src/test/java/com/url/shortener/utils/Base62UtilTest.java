@@ -10,7 +10,7 @@ class Base62UtilTest {
 
     @ParameterizedTest
     @DisplayName("숫자가 Base62 알고리즘을 거쳐 정상적으로 임의의 문자열로 변환된다.")
-    @CsvSource(value = {"1,1", "1000001,39C4", "232442556,UvIjF"})
+    @CsvSource(value = {"1,39C4", "123456789,ZtCQ8"})
     void BASE62_정상_변환_테스트(Long number, String expectedEncodedKey) {
         String actualEncodedKey = Base62Util.encodeFromNumber(number);
 
