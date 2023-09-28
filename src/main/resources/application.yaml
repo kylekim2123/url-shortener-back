@@ -19,3 +19,6 @@ spring:
         format_sql: true
         hbm2ddl:
           auto: create-drop
+
+env:
+  short-url-domain: ${LOCAL_SHORT_URL_DOMAIN}
