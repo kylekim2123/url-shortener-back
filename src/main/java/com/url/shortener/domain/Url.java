@@ -31,8 +31,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Url {
 
-    private static final Long INITIAL_PADDING = 1_000_000L;
-
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
@@ -65,7 +63,11 @@ public class Url {
     }
 
     public void generateShortUrlKey() {
-        this.shortUrlKey = Base62Util.encodeFromNumber(id + INITIAL_PADDING);
+        this.shortUrlKey = Base62Util.encodeFromNumber(id);
+    }
+
+    public void increaseRequestCount() {
+        this.requestCount += 1;
     }
 
     public void increaseShorteningCount() {
