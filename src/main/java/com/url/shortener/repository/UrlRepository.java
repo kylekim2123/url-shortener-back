@@ -9,4 +9,6 @@ import com.url.shortener.domain.Url;
 public interface UrlRepository extends JpaRepository<Url, Long> {
 
     Optional<Url> findByOriginalUrl(String originalUrl);
+
+    Optional<Url> findByShortUrlKey(String key);
 }

@@ -48,4 +48,12 @@ public class UrlService {
 
         return UrlResponse.fromEntity(url, fullShortUrlAddress);
     }
+
+    @Transactional
+    public String getOriginalUrlByShortUrlKey(String key) {
+        Url url = urlRepository.findByShortUrlKey(key).orElseThrow();
+        url.increaseRequestCount();
+
+        return url.getOriginalUrl();
+    }
 }
