@@ -1,5 +1,6 @@
 package com.url.shortener.service;
 
+import static com.url.shortener.exception.ExceptionRule.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.AfterEach;
@@ -14,12 +15,13 @@ import com.url.shortener.domain.Url;
 import com.url.shortener.dto.request.UrlRequest;
 import com.url.shortener.dto.response.UrlIdResponse;
 import com.url.shortener.dto.response.UrlResponse;
+import com.url.shortener.exception.UrlException;
 import com.url.shortener.repository.UrlRepository;
 
 @SpringBootTest
 class UrlServiceTest {
 
-    private static final String INIT_ORIGINAL_URL = "https://www.urlShortener.com/";
+    private static final String INIT_ORIGINAL_URL = "https://www.google.co.kr/";
 
     @Autowired
     private UrlService urlService;
@@ -46,7 +48,7 @@ class UrlServiceTest {
     @DisplayName("임의의 URL의 단축 정보를 생성하여 저장된 short URL의 ID를 반환한다.")
     void 단축_URL_생성_여부_테스트() {
         //when
-        UrlRequest urlRequest = UrlRequest.from("https://www.newUrlShortener.com/");
+        UrlRequest urlRequest = UrlRequest.from("https://www.naver.com/");
         UrlIdResponse urlIdResponse = urlService.createShortUrl(urlRequest);
 
         //then
@@ -95,5 +97,43 @@ class UrlServiceTest {
 
         //then
         assertThat(originalUrl).isEqualTo(INIT_ORIGINAL_URL);
+    }
+
+    @Test
+    @DisplayName("short URL을 다시 단축하려는 경우 예외가 발생한다.")
+    void SHORT_URL_재단축_예외_테스트() {
+        //given
+        Url savedUrl = urlRepository.findByOriginalUrl(INIT_ORIGINAL_URL).get();
+        String shortUrl = urlDomain + savedUrl.getShortUrlKey();
+        UrlRequest urlRequest = UrlRequest.from(shortUrl);
+
+        //when, then
+        assertThatThrownBy(() -> urlService.createShortUrl(urlRequest))
+            .isInstanceOf(UrlException.class)
+            .hasMessage(SHORT_URL_CANNOT_BE_SHORTENED.getMessage());
+    }
+
+    @Test
+    @DisplayName("short URL의 id값에 해당하는 정보가 없으면 예외가 발생한다.")
+    void ID값_기준_조회_예외_테스트() {
+        //given
+        Long unexistedId = 0L;
+
+        //when,then
+        assertThatThrownBy(() -> urlService.findShortUrlById(unexistedId))
+            .isInstanceOf(UrlException.class)
+            .hasMessage(SHORT_URL_NOT_EXISTED.getMessage());
+    }
+
+    @Test
+    @DisplayName("short URL의 Key값에 해당하는 정보가 없으면 예외가 발생한다.")
+    void KEY값_기준_조회_예외_테스트() {
+        //given
+        String unexistedKey = "unexisted";
+
+        //when,then
+        assertThatThrownBy(() -> urlService.getOriginalUrlByShortUrlKey(unexistedKey))
+            .isInstanceOf(UrlException.class)
+            .hasMessage(SHORT_URL_KEY_NOT_EXISTED.getMessage());
     }
 }
