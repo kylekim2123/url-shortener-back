@@ -14,6 +14,7 @@ import com.url.shortener.dto.response.UrlResponse;
 import com.url.shortener.service.UrlService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +25,7 @@ public class UrlController {
 
     @PostMapping("/api/short-urls")
     @ResponseStatus(HttpStatus.CREATED)
-    public UrlIdResponse createShortUrl(@RequestBody UrlRequest urlRequest) {
+    public UrlIdResponse createShortUrl(@Valid @RequestBody UrlRequest urlRequest) {
         return urlService.createShortUrl(urlRequest);
     }
 
