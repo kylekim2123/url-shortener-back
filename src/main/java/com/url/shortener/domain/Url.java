@@ -1,5 +1,7 @@
 package com.url.shortener.domain;
 
+import static com.url.shortener.exception.ExceptionRule.*;
+
 import java.time.LocalDateTime;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -9,7 +11,9 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.url.shortener.exception.UrlException;
 import com.url.shortener.utils.Base62Util;
+import com.url.shortener.utils.UrlConnectionUtil;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,6 +59,8 @@ public class Url {
     private LocalDateTime updatedDatetime;
 
     private Url(String originalUrl) {
+        validateOriginalUrlIsValid(originalUrl);
+
         this.originalUrl = originalUrl;
     }
 
@@ -72,5 +78,11 @@ public class Url {
 
     public void increaseShorteningCount() {
         this.shorteningCount += 1;
+    }
+
+    private void validateOriginalUrlIsValid(String originalUrl) {
+        if (!UrlConnectionUtil.isValidUrl(originalUrl)) {
+            throw new UrlException(ORIGINAL_URL_INVALID, originalUrl);
+        }
     }
 }
