@@ -1,5 +1,7 @@
 package com.url.shortener.service;
 
+import static com.url.shortener.exception.ExceptionRule.*;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +12,7 @@ import com.url.shortener.domain.Url;
 import com.url.shortener.dto.request.UrlRequest;
 import com.url.shortener.dto.response.UrlIdResponse;
 import com.url.shortener.dto.response.UrlResponse;
+import com.url.shortener.exception.UrlException;
 import com.url.shortener.repository.UrlRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class UrlService {
 
+    private static final String EMPTY_STRING = "";
+
     private final UrlRepository urlRepository;
 
     @Value("${env.short-url-domain}")
@@ -26,6 +31,8 @@ public class UrlService {
 
     @Transactional
     public UrlIdResponse createShortUrl(UrlRequest urlRequest) {
+        validateOriginalUrlIsShortUrl(urlRequest.getOriginalUrl());
+
         Url url = urlRequest.toEntity();
         Optional<Url> foundUrl = urlRepository.findByOriginalUrl(url.getOriginalUrl());
 
@@ -43,7 +50,9 @@ public class UrlService {
     }
 
     public UrlResponse findShortUrlById(Long id) {
-        Url url = urlRepository.findById(id).orElseThrow();
+        Url url = urlRepository.findById(id)
+            .orElseThrow(() -> new UrlException(SHORT_URL_NOT_EXISTED, id));
+
         String fullShortUrlAddress = shortUrlDomain + url.getShortUrlKey();
 
         return UrlResponse.fromEntity(url, fullShortUrlAddress);
@@ -51,9 +60,21 @@ public class UrlService {
 
     @Transactional
     public String getOriginalUrlByShortUrlKey(String key) {
-        Url url = urlRepository.findByShortUrlKey(key).orElseThrow();
+        Url url = urlRepository.findByShortUrlKey(key)
+            .orElseThrow(() -> new UrlException(SHORT_URL_KEY_NOT_EXISTED, key));
+
         url.increaseRequestCount();
 
         return url.getOriginalUrl();
+    }
+
+    private void validateOriginalUrlIsShortUrl(String originalUrl) {
+        if (originalUrl.startsWith(shortUrlDomain)) {
+            String key = originalUrl.replaceAll(shortUrlDomain, EMPTY_STRING);
+
+            if (urlRepository.existsByShortUrlKey(key)) {
+                throw new UrlException(SHORT_URL_CANNOT_BE_SHORTENED, originalUrl);
+            }
+        }
     }
 }
