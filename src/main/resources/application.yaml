@@ -26,4 +26,5 @@ spring:
       add-mappings: false
 
 env:
-  short-url-domain: ${LOCAL_SHORT_URL_DOMAIN}
+  server-base-url: ${LOCAL_SERVER_BASE_URL}
+  client-base-url: ${LOCAL_CLIENT_BASE_URL}

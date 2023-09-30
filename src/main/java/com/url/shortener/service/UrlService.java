@@ -26,8 +26,8 @@ public class UrlService {
 
     private final UrlRepository urlRepository;
 
-    @Value("${env.short-url-domain}")
-    private String shortUrlDomain;
+    @Value("${env.server-base-url}")
+    private String serverBaseUrl;
 
     @Transactional
     public UrlIdResponse createShortUrl(UrlRequest urlRequest) {
@@ -53,7 +53,7 @@ public class UrlService {
         Url url = urlRepository.findById(id)
             .orElseThrow(() -> new UrlException(SHORT_URL_NOT_EXISTED, id));
 
-        String fullShortUrlAddress = shortUrlDomain + url.getShortUrlKey();
+        String fullShortUrlAddress = serverBaseUrl + url.getShortUrlKey();
 
         return UrlResponse.fromEntity(url, fullShortUrlAddress);
     }
@@ -69,8 +69,8 @@ public class UrlService {
     }
 
     private void validateOriginalUrlIsShortUrl(String originalUrl) {
-        if (originalUrl.startsWith(shortUrlDomain)) {
-            String key = originalUrl.replaceAll(shortUrlDomain, EMPTY_STRING);
+        if (originalUrl.startsWith(serverBaseUrl)) {
+            String key = originalUrl.replaceAll(serverBaseUrl, EMPTY_STRING);
 
             if (urlRepository.existsByShortUrlKey(key)) {
                 throw new UrlException(SHORT_URL_CANNOT_BE_SHORTENED, originalUrl);

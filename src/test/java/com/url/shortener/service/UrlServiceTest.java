@@ -29,8 +29,8 @@ class UrlServiceTest {
     @Autowired
     private UrlRepository urlRepository;
 
-    @Value("${env.short-url-domain}")
-    private String urlDomain;
+    @Value("${env.server-base-url}")
+    private String serverBaseUrl;
 
     @BeforeEach
     void initData() {
@@ -82,7 +82,7 @@ class UrlServiceTest {
         //then
         assertThat(urlResponse.getId()).isEqualTo(savedUrl.getId());
         assertThat(urlResponse.getOriginalUrl()).isEqualTo(INIT_ORIGINAL_URL);
-        assertThat(urlResponse.getShortUrl()).isEqualTo(urlDomain + key);
+        assertThat(urlResponse.getShortUrl()).isEqualTo(serverBaseUrl + key);
     }
 
     @Test
@@ -104,7 +104,7 @@ class UrlServiceTest {
     void SHORT_URL_재단축_예외_테스트() {
         //given
         Url savedUrl = urlRepository.findByOriginalUrl(INIT_ORIGINAL_URL).get();
-        String shortUrl = urlDomain + savedUrl.getShortUrlKey();
+        String shortUrl = serverBaseUrl + savedUrl.getShortUrlKey();
         UrlRequest urlRequest = UrlRequest.from(shortUrl);
 
         //when, then
