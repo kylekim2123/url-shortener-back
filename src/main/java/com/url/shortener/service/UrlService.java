@@ -14,6 +14,7 @@ import com.url.shortener.dto.response.UrlIdResponse;
 import com.url.shortener.dto.response.UrlResponse;
 import com.url.shortener.exception.UrlException;
 import com.url.shortener.repository.UrlRepository;
+import com.url.shortener.utils.encoding.EncodingUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,7 @@ public class UrlService {
     private static final String EMPTY_STRING = "";
 
     private final UrlRepository urlRepository;
+    private final EncodingUtil encodingUtil;
 
     @Value("${env.server-base-url}")
     private String serverBaseUrl;
@@ -44,7 +46,9 @@ public class UrlService {
         }
 
         Url savedUrl = urlRepository.save(url);
-        savedUrl.generateShortUrlKey();
+        String shortUrlKey = encodingUtil.encodeFromNumber(savedUrl.getId());
+
+        savedUrl.updateShortUrlKey(shortUrlKey);
 
         return UrlIdResponse.from(savedUrl.getId());
     }

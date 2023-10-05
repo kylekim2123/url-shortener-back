@@ -12,7 +12,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.url.shortener.exception.UrlException;
-import com.url.shortener.utils.Base62Util;
 import com.url.shortener.utils.UrlConnectionUtil;
 
 import jakarta.persistence.Column;
@@ -68,8 +67,8 @@ public class Url {
         return new Url(originalUrl);
     }
 
-    public void generateShortUrlKey() {
-        this.shortUrlKey = Base62Util.encodeFromNumber(id);
+    public void updateShortUrlKey(String shortUrlKey) {
+        this.shortUrlKey = shortUrlKey;
     }
 
     public void increaseRequestCount() {
