@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.url.shortener.domain.Url;
 import com.url.shortener.dto.request.UrlRequest;
-import com.url.shortener.dto.response.UrlIdResponse;
+import com.url.shortener.dto.response.ShortUrlKeyResponse;
 import com.url.shortener.dto.response.UrlResponse;
 import com.url.shortener.exception.UrlException;
 import com.url.shortener.repository.UrlRepository;
@@ -32,7 +32,7 @@ public class UrlService {
     private String serverBaseUrl;
 
     @Transactional
-    public UrlIdResponse createShortUrl(UrlRequest urlRequest) {
+    public ShortUrlKeyResponse createShortUrl(UrlRequest urlRequest) {
         validateOriginalUrlIsShortUrl(urlRequest.getOriginalUrl());
 
         Url url = urlRequest.toEntity();
@@ -42,7 +42,7 @@ public class UrlService {
             Url existedUrl = foundUrl.get();
             existedUrl.increaseShorteningCount();
 
-            return UrlIdResponse.from(existedUrl.getId());
+            return ShortUrlKeyResponse.from(existedUrl.getShortUrlKey());
         }
 
         Url savedUrl = urlRepository.save(url);
@@ -50,13 +50,11 @@ public class UrlService {
 
         savedUrl.updateShortUrlKey(shortUrlKey);
 
-        return UrlIdResponse.from(savedUrl.getId());
+        return ShortUrlKeyResponse.from(savedUrl.getShortUrlKey());
     }
 
-    public UrlResponse findShortUrlById(Long id) {
-        Url url = urlRepository.findById(id)
-            .orElseThrow(() -> new UrlException(SHORT_URL_NOT_EXISTED, id));
-
+    public UrlResponse findShortUrlById(String key) {
+        Url url = findShortUrl(key);
         String fullShortUrlAddress = serverBaseUrl + url.getShortUrlKey();
 
         return UrlResponse.fromEntity(url, fullShortUrlAddress);
@@ -64,12 +62,15 @@ public class UrlService {
 
     @Transactional
     public String getOriginalUrlByShortUrlKey(String key) {
-        Url url = urlRepository.findByShortUrlKey(key)
-            .orElseThrow(() -> new UrlException(SHORT_URL_KEY_NOT_EXISTED, key));
-
+        Url url = findShortUrl(key);
         url.increaseRequestCount();
 
         return url.getOriginalUrl();
+    }
+
+    private Url findShortUrl(String key) {
+        return urlRepository.findByShortUrlKey(key)
+            .orElseThrow(() -> new UrlException(SHORT_URL_KEY_NOT_EXISTED, key));
     }
 
     private void validateOriginalUrlIsShortUrl(String originalUrl) {

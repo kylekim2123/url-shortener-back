@@ -13,8 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.url.shortener.domain.Url;
 import com.url.shortener.dto.request.UrlRequest;
-import com.url.shortener.dto.response.UrlIdResponse;
-import com.url.shortener.dto.response.UrlResponse;
+import com.url.shortener.dto.response.ShortUrlKeyResponse;
 import com.url.shortener.exception.UrlException;
 import com.url.shortener.repository.UrlRepository;
 
@@ -45,11 +44,11 @@ class UrlServiceTest {
     }
 
     @Test
-    @DisplayName("임의의 URL의 단축 정보를 생성하여 저장된 short URL의 ID를 반환한다.")
+    @DisplayName("임의의 URL의 단축 정보를 생성한다.")
     void 단축_URL_생성_여부_테스트() {
         //when
         UrlRequest urlRequest = UrlRequest.from("https://www.naver.com/");
-        UrlIdResponse urlIdResponse = urlService.createShortUrl(urlRequest);
+        urlService.createShortUrl(urlRequest);
 
         //then
         long allUrlsCount = urlRepository.count();
@@ -57,32 +56,16 @@ class UrlServiceTest {
     }
 
     @Test
-    @DisplayName("이미 존재하는 URL의 단축 정보를 생성할 때, 새로 생성하지 않고 기존 short URL의 ID를 반환한다.")
+    @DisplayName("이미 존재하는 URL의 단축 정보를 생성할 때, 새로 생성하지 않고 기존 short URL의 key를 반환한다.")
     void 단축_URL_중복_생성_여부_테스트() {
         //when
         UrlRequest urlRequest = UrlRequest.from(INIT_ORIGINAL_URL);
-        UrlIdResponse urlIdResponse = urlService.createShortUrl(urlRequest);
+        ShortUrlKeyResponse shortUrlKeyResponse = urlService.createShortUrl(urlRequest);
 
         //then
         Url existedUrl = urlRepository.findByOriginalUrl(INIT_ORIGINAL_URL).get();
-        assertThat(urlIdResponse.getId()).isEqualTo(existedUrl.getId());
+        assertThat(shortUrlKeyResponse.getShortUrlKey()).isEqualTo(existedUrl.getShortUrlKey());
         assertThat(existedUrl.getShorteningCount()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("short URL의 id값을 기준으로 정상적으로 UrlResponse를 반환한다.")
-    void ID값_기준_정상_조회_테스트() {
-        //given
-        Url savedUrl = urlRepository.findByOriginalUrl(INIT_ORIGINAL_URL).get();
-        String key = savedUrl.getShortUrlKey();
-
-        //when
-        UrlResponse urlResponse = urlService.findShortUrlById(savedUrl.getId());
-
-        //then
-        assertThat(urlResponse.getId()).isEqualTo(savedUrl.getId());
-        assertThat(urlResponse.getOriginalUrl()).isEqualTo(INIT_ORIGINAL_URL);
-        assertThat(urlResponse.getShortUrl()).isEqualTo(serverBaseUrl + key);
     }
 
     @Test
@@ -111,18 +94,6 @@ class UrlServiceTest {
         assertThatThrownBy(() -> urlService.createShortUrl(urlRequest))
             .isInstanceOf(UrlException.class)
             .hasMessage(SHORT_URL_CANNOT_BE_SHORTENED.getMessage());
-    }
-
-    @Test
-    @DisplayName("short URL의 id값에 해당하는 정보가 없으면 예외가 발생한다.")
-    void ID값_기준_조회_예외_테스트() {
-        //given
-        Long unexistedId = 0L;
-
-        //when,then
-        assertThatThrownBy(() -> urlService.findShortUrlById(unexistedId))
-            .isInstanceOf(UrlException.class)
-            .hasMessage(SHORT_URL_NOT_EXISTED.getMessage());
     }
 
     @Test
