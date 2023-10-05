@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.url.shortener.dto.request.UrlRequest;
-import com.url.shortener.dto.response.UrlIdResponse;
+import com.url.shortener.dto.response.ShortUrlKeyResponse;
 import com.url.shortener.dto.response.UrlResponse;
 import com.url.shortener.service.UrlService;
 
@@ -25,13 +25,13 @@ public class UrlController {
 
     @PostMapping("/api/short-urls")
     @ResponseStatus(HttpStatus.CREATED)
-    public UrlIdResponse createShortUrl(@Valid @RequestBody UrlRequest urlRequest) {
+    public ShortUrlKeyResponse createShortUrl(@Valid @RequestBody UrlRequest urlRequest) {
         return urlService.createShortUrl(urlRequest);
     }
 
-    @GetMapping("/api/short-urls/{id}")
-    public UrlResponse findShortUrlById(@PathVariable Long id) {
-        return urlService.findShortUrlById(id);
+    @GetMapping("/api/short-urls/{key}")
+    public UrlResponse findShortUrlById(@PathVariable String key) {
+        return urlService.findShortUrlById(key);
     }
 
     @GetMapping("/{key}")

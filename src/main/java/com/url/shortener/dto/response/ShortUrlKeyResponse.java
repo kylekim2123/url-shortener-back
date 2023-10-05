@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(staticName = "from")
-public class UrlIdResponse {
+public class ShortUrlKeyResponse {
 
-    private Long id;
+    private String shortUrlKey;
 }
