@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 public enum ExceptionRule {
 
     ORIGINAL_URL_INVALID(HttpStatus.BAD_REQUEST, "올바르지 않은 Original URL 입력"),
-    SHORT_URL_NOT_EXISTED(HttpStatus.NOT_FOUND, "입력한 ID에 해당하는 Short URL을 찾을 수 없음"),
     SHORT_URL_KEY_INVALID(HttpStatus.BAD_REQUEST, "올바르지 않은 Short URL Key 입력"),
     SHORT_URL_KEY_NOT_EXISTED(HttpStatus.NOT_FOUND, "입력한 Short URL Key를 찾을 수 없음"),
     SHORT_URL_CANNOT_BE_SHORTENED(HttpStatus.BAD_REQUEST, "Short URL은 더이상 단축할 수 없음"),
