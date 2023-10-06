@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${LOCAL_DATASOURCE_URL}
+    username: ${LOCAL_DATASOURCE_USERNAME}
+    password: ${LOCAL_DATASOURCE_PASSWORD}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        query.in_clause_parameter_padding: true
+
+env:
+  server-base-url: ${LOCAL_SERVER_BASE_URL}
+  client-base-url: ${LOCAL_CLIENT_BASE_URL}
+
+server:
+  port: 8080

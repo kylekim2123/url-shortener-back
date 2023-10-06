@@ -35,10 +35,10 @@ import lombok.NoArgsConstructor;
 public class Url {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 1000, nullable = false, unique = true)
+    @Column(length = 1000, nullable = false)
     private String originalUrl;
 
     @Column(length = 10, unique = true)
