@@ -2,7 +2,7 @@ package com.url.shortener.dto.request;
 
 import com.url.shortener.domain.Url;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "from")
 public class UrlRequest {
 
-    @NotEmpty(message = "Original Url이 입력되지 않음")
+    @Pattern(
+        regexp = "^(http:\\/\\/www\\.|https:\\/\\/www\\.|http:\\/\\/|https:\\/\\/)?[a-z0-9]+([\\-\\.]{1}[a-z0-9]+)*\\.[a-z]{2,5}(:[0-9]{1,5})?(\\/.*)?$",
+        message = "잘못된 형식의 Original Url이 입력됨"
+    )
     private String originalUrl;
 
     public Url toEntity() {
