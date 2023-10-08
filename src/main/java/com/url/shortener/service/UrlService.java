@@ -53,6 +53,16 @@ public class UrlService {
         return ShortUrlKeyResponse.from(savedUrl.getShortUrlKey());
     }
 
+    private void validateOriginalUrlIsShortUrl(String originalUrl) {
+        if (originalUrl.startsWith(serverBaseUrl)) {
+            String key = originalUrl.replaceAll(serverBaseUrl, EMPTY_STRING);
+
+            if (urlRepository.existsByShortUrlKey(key)) {
+                throw new UrlException(SHORT_URL_CANNOT_BE_SHORTENED, originalUrl);
+            }
+        }
+    }
+
     public UrlResponse findShortUrlById(String key) {
         Url url = findShortUrl(key);
         String fullShortUrlAddress = serverBaseUrl + url.getShortUrlKey();
@@ -71,15 +81,5 @@ public class UrlService {
     private Url findShortUrl(String key) {
         return urlRepository.findByShortUrlKey(key)
             .orElseThrow(() -> new UrlException(SHORT_URL_KEY_NOT_EXISTED, key));
-    }
-
-    private void validateOriginalUrlIsShortUrl(String originalUrl) {
-        if (originalUrl.startsWith(serverBaseUrl)) {
-            String key = originalUrl.replaceAll(serverBaseUrl, EMPTY_STRING);
-
-            if (urlRepository.existsByShortUrlKey(key)) {
-                throw new UrlException(SHORT_URL_CANNOT_BE_SHORTENED, originalUrl);
-            }
-        }
     }
 }
