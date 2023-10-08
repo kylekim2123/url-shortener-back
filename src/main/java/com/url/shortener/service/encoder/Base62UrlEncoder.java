@@ -1,13 +1,13 @@
-package com.url.shortener.utils.encoding;
+package com.url.shortener.service.encoder;
 
 import org.springframework.stereotype.Component;
 
 @Component
-public class Base62Util implements EncodingUtil {
+public class Base62UrlEncoder implements UrlEncoder {
 
     private static final String CODE = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final int BASE = 62;
-    private static final Long INITIAL_PADDING = 1_000_000L;
+    private static final long INITIAL_PADDING = 1_000_000L;
 
     @Override
     public String encodeFromNumber(long number) {
